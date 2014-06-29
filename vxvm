@@ -1,0 +1,88 @@
+#!/bin/bash
+
+set -e
+set -x
+
+lang=$1
+version=$2
+pkg_prefix="vx-packages-"
+pkg_packages="/dists/trusty/main/binary-amd64/Packages.gz"
+pkg_host=${PKG_HOST:-http://trusty.pkg.vexor.io}
+regexp=$(perl -e "print(quotemeta('${pkg_prefix}${lang}-${version}'))")
+awk=${AWK:-awk}
+
+curl="curl --fail --silent --show-error"
+
+usage () {
+  cat <<EOF
+  Usage vxvm <lang> <version>
+EOF
+  exit 1
+}
+
+echoerr() {
+  echo "$@" 1>&2;
+}
+
+silent_output () {
+  cmd=$@
+
+  log=$(mktemp -t vx)
+
+  $cmd > $log 2> $log || (
+    echoerr "failed: $cmd"
+    echoerr ""
+    cat $log
+    rm $log
+    exit 1
+  )
+
+  rm -f $log
+}
+
+test "x$lang" = "x" && usage
+test "x$version" = "x" && usage
+
+# download metadata
+metadata=$(mktemp -t vx)
+$curl $pkg_host/$pkg_packages | gunzip | \
+  $awk '/Package/{ print $2} ; /Filename/ { print $2 }' | \
+  xargs -n2 \
+  > $metadata
+
+# strict match
+package_url=$(cat $metadata | $awk -v ref="^$regexp " 'match($0, ref){ print $2 }' | head -n1)
+package_version=$(cat $metadata | $awk -v ref="^$regexp " 'match($0, ref){ print $1 }' | head -n1)
+
+if [ "x$package_name" = "x" ] ; then
+  # fuzzy match
+  package_url=$(cat $metadata | sort -r | $awk -v ref="^$regexp" 'match($0, ref){ print $2}' | head -n1)
+  package_version=$(cat $metadata | sort -r | $awk -v ref="^$regexp" 'match($0, ref){ print $1}' | head -n1)
+fi
+
+rm $metadata
+
+if [ "x$package_url" = "x" ] ; then
+  echoerr "cannot found $lang ($version)"
+  exit 1
+fi
+
+# download package
+package_install_path=/opt/vexor/packages/${package_version}
+
+if [ -d $package_install_path ] ; then
+  echoerr "Using $package_version"
+fi
+
+if [ ! -d $package_install_path ] ; then
+  package_file=$(basename $package_name)
+  package_tmp_dir=$(mktemp -d -t vx)
+  package_tmp_file=$package_tmp_dir/$package_file
+
+  echoerr "download and install $package_version"
+  $curl $pkg_host/$package_url > $package_tmp_file
+  silent_output dpkg -i $package_tmp_file
+  rm -rf $package_tmp_dir
+fi
+
+echo $package_install_path/activate
