@@ -54,7 +54,7 @@ nodejs_compile () {
     esac
 
     echo " --> make $id"
-    silent_output make
+    silent_output make -j$(nproc)
 
     echo " --> install $id"
     silent_output make install

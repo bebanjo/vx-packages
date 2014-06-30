@@ -31,7 +31,7 @@ echoerr() {
 }
 
 notice () {
-  echo "--> $1"
+  echo " --> $1"
 }
 
 aptly_create_repo () {
