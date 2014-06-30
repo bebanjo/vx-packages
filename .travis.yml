@@ -4,9 +4,9 @@ env:
     - B=ruby
     - B=nodejs
   global:
-    - GO_ITERATION=$CI_BUILD_ID
-    - RUBY_ITERATION=$CI_BUILD_ID
-    - NODEJS_ITERATION=$CI_BUILD_ID
+    - GO_ITERATION=$CI_BUILD_NUMBER
+    - RUBY_ITERATION=$CI_BUILD_NUMBER
+    - NODEJS_ITERATION=$CI_BUILD_NUMBER
 
 vexor:
   read_timeout: 1800 # 30 minutes
@@ -14,4 +14,3 @@ vexor:
 script:
   - make $B
   - bin/upload.sh debs/
-
