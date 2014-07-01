@@ -70,6 +70,18 @@ export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
 EOF
 }
 
+go_install_tools () {
+  local id=$1
+  local version=$2
+  local src=$install_root/$id
+
+  echo " --> install code.google.com/p/go.tools/cmd/vet"
+  silent_output env PATH=$src/bin:$PATH go get code.google.com/p/go.tools/cmd/vet
+
+  echo " --> install code.google.com/p/go.tools/cmd/cover"
+  silent_output env PATH=$src/bin:$PATH go get code.google.com/p/go.tools/cmd/cover
+}
+
 go_build () {
   hg_clone https://go.googlecode.com/hg/ $go_source_repo
 
@@ -95,6 +107,7 @@ go_build () {
     deb_exists $(go_package_file $id $version) || (
       hg_copy              $ref $go_source_repo $install_root/$id
       go_compile           $id $version
+      go_install_tools     $id $version
       go_create_activation $id $version
       deb_create           $install_root/$id $id $version $go_iteration
     )
