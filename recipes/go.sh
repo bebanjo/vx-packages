@@ -65,7 +65,7 @@ go_create_activation () {
 
   cat > $src/activate << EOF
 export GOROOT=$src
-export GOPATH=~/.vexor/gopath
+export GOPATH=$src/global
 export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
 EOF
 }
@@ -75,11 +75,13 @@ go_install_tools () {
   local version=$2
   local src=$install_root/$id
 
-  echo " --> install code.google.com/p/go.tools/cmd/vet"
-  silent_output env PATH=$src/bin:$PATH go get code.google.com/p/go.tools/cmd/vet
+  mkdir -p $src/global
 
   echo " --> install code.google.com/p/go.tools/cmd/cover"
-  silent_output env PATH=$src/bin:$PATH go get code.google.com/p/go.tools/cmd/cover
+  silent_output env GOPATH=$src/global PATH=$src/bin:$src/global/bin:$PATH go get code.google.com/p/go.tools/cmd/cover
+
+  echo " --> install github.com/golang/lint/golint"
+  silent_output env GOPATH=$src/global PATH=$src/bin:$src/global/bin:$PATH go get github.com/golang/lint/golint
 }
 
 go_build () {
