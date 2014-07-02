@@ -10,10 +10,13 @@ pkg_install_path="/opt/vexor/packages"
 
 #
 awk=${AWK:-awk}
-
-#
-curl="curl --fail --silent --show-error"
+curl="curl --fail --silent --show-error --tcp-nodelay --retry 3"
 mktemp="mktemp"
+
+if [ "x$(uname)" = "xDarwin" ] ; then
+  awk="gawk"
+  mktemp="mktemp -t vx"
+fi
 
 # forward reclaration
 package_path=""
@@ -49,7 +52,7 @@ vxvm_search_in_repo () {
   local regexp="${pkg_prefix}${lang}-${version}"
 
   # download metadata
-  metadata=$($mktemp)
+  local metadata=$($mktemp)
   $curl $pkg_host/$pkg_metadata | gunzip | \
     $awk '/Package/{ print $2} ; /Filename/ { print $2 }' | \
     xargs -n2 \
@@ -74,7 +77,7 @@ vxvm_extract_id () {
 
 vxvm_valid_package_url () {
   if [ "x$package_path" = "x" ] ; then
-    echoerr "cannot found $lang ($version)"
+    echoerr "cannot found $lang $version"
     exit 1
   fi
 }
@@ -131,6 +134,30 @@ vxvm_install () {
   echo $pkg_install_path/$id/activate
 }
 
+vxvm_location () {
+  local lang=$1
+  local version=$2
+
+  test "x$lang" = "x" && vxvm_usage "location"
+  test "x$version" = "x" && vxvm_usage "location"
+
+  vxvm_search_in_repo $lang $version
+  vxvm_valid_package_url
+
+  local id=$(vxvm_extract_id)
+
+
+  test -d $pkg_install_path/$id && (
+    echo $pkg_install_path/$id
+    exit 0
+  )
+
+  test -d $pkg_install_path/$id || (
+    echoerr "cannot found $lang $version"
+    exit 1
+  )
+}
+
 case $1 in
   search)
     vxvm_search $2 $3
@@ -138,8 +165,11 @@ case $1 in
   install)
     vxvm_install $2 $3
     ;;
+  location)
+    vxvm_location $2 $3
+    ;;
   *)
-    echo "Usage vxvm (search|install)"
+    echo "Usage vxvm (search|install|location)"
     ;;
 esac
 
