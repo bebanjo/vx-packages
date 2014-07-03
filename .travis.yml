@@ -11,6 +11,10 @@ env:
 vexor:
   read_timeout: 1800 # 30 minutes
 
+before_script:
+  - sudo apt-get -qy remove vx-packages-*
+  - sudo find -L /usr/local/bin/ -type l -delete
+
 script:
   - make $B
   - bin/upload.sh debs/
