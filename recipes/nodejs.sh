@@ -111,6 +111,14 @@ nodejs_copy_sources () {
   git_copy "v$version" $nodejs_source_repo $build_root/$id
 }
 
+nodejs_update_npm () {
+  local id=$1
+  local version=$2
+
+  echo " --> update npm for $id"
+  silent_output "$install_root/$id/bin/npm install -g npm"
+}
+
 nodejs_build () {
   git_clone https://github.com/joyent/node.git $nodejs_source_repo
   clean_metadata $nodejs_metadata_root
@@ -128,6 +136,7 @@ nodejs_build () {
     deb_exists $(nodejs_package_file $id $version) || (
       nodejs_copy_sources      $id $version
       nodejs_compile           $id $version
+      nodejs_update_npm        $id $version
       nodejs_create_activation $id $version
       deb_create               $install_root/$id $id $version $nodejs_iteration
     )
