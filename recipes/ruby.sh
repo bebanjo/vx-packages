@@ -128,7 +128,7 @@ ruby_build () {
         id="ruby-head"
         build_id=$ref
         version=0.0.0
-        ruby_iteration=$(date +%y%m%d)
+        ruby_iteration=$(date +%y%m%d).${ruby_iteration}
         ;;
     esac
 

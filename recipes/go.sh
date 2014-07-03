@@ -98,7 +98,7 @@ go_build () {
       "tip")
         id="go-tip"
         version=0.0.0
-        go_iteration=$(date +%y%m%d)
+        go_iteration=$(date +%y%m%d).${go_iteration}
         ;;
     esac
 
