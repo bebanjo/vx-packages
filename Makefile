@@ -9,13 +9,17 @@ RUBY_ITERATION   ?= 3
 NODEJS_VERSIONS  := "0.9.12 0.10.29 0.11.13"
 NODEJS_ITERATION ?= 3
 
+RUST_VERSIONS    := "nightly 0.11.0"
+RUST_ITERATION   ?= 3
+
 export GO_ITERATION
 export RUBY_ITERATION
 export NODEJS_ITERATION
+export RUST_ITERATION
 
 default: build
 
-.PHONY: go ruby nodejs metadata upload
+.PHONY: go ruby nodejs metadata upload rust
 
 go:
 	@echo
@@ -32,7 +36,12 @@ nodejs:
 	@echo "==== nodejs: $(NODEJS_VERSIONS) ===="
 	@recipes/nodejs.sh $(NODEJS_VERSIONS)
 
-build: go ruby nodejs
+rust:
+	@echo
+	@echo "==== rust: $(RUST_VERSIONS) ===="
+	@recipes/rust.sh $(RUST_VERSIONS)
+
+build: go ruby nodejs rust
 
 upload: build
 	@echo

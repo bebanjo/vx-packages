@@ -97,7 +97,8 @@ go_build () {
     case $ref in
       "tip")
         id="go-tip"
-        version=$(date +%y%m%d)
+        version=0.0.0
+        go_iteration=$(date +%y%m%d)
         ;;
     esac
 

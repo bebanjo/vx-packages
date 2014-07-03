@@ -127,7 +127,8 @@ ruby_build () {
       2.2.0-dev)
         id="ruby-head"
         build_id=$ref
-        version=$(date +%y%m%d)
+        version=0.0.0
+        ruby_iteration=$(date +%y%m%d)
         ;;
     esac
 
