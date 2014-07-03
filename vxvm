@@ -18,7 +18,6 @@ if [ "x$(uname)" = "xDarwin" ] ; then
   mktemp="mktemp -t vx"
 fi
 
-# forward reclaration
 package_path=""
 package_name=""
 
