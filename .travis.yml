@@ -3,10 +3,12 @@ env:
     - B=go
     - B=ruby
     - B=nodejs
+    - B=rust
   global:
     - GO_ITERATION=$CI_BUILD_NUMBER
     - RUBY_ITERATION=$CI_BUILD_NUMBER
     - NODEJS_ITERATION=$CI_BUILD_NUMBER
+    - RUST_ITERATION=$CI_BUILD_NUMBER
 
 vexor:
   read_timeout: 1800 # 30 minutes
