@@ -23,8 +23,9 @@ metadata_file=$deb_root/metadata.txt
 if [ ! -d $install_root ] ; then
   echo " --> creates $install_root"
   sudo mkdir -p $install_root
-  sudo chown $USER:$USER $install_root
 fi
+
+sudo chown $USER:$USER $install_root
 
 if [ ! -d $build_root ] ; then
   echo " --> creates $build_root"

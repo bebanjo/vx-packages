@@ -61,21 +61,28 @@ nodejs_compile () {
   )
 }
 
-nodejs_clean () {
+
+nodejs_clean_build_root () {
   local id=$1
   local version=$2
 
   local src=$build_root/$id
-  local dst=$install_root/$id
 
   if [ -d $src ] ; then
     echo " --> remove $src"
     rm -rf $src
   fi
+}
 
-  if [ -d $dst ] ; then
-    echo " --> remove $dst"
-    rm -rf $dst
+nodejs_clean_install_root () {
+  local id=$1
+  local version=$2
+
+  local src=$install_root/$id
+
+  if [ -d $src ] ; then
+    echo " --> remove $src"
+    rm -rf $src
   fi
 }
 
@@ -134,14 +141,16 @@ nodejs_build () {
       echo " --> package for $id exists"
     )
     deb_exists $(nodejs_package_file $id $version) || (
-      nodejs_copy_sources      $id $version
-      nodejs_compile           $id $version
-      nodejs_update_npm        $id $version
-      nodejs_create_activation $id $version
-      deb_create               $install_root/$id $id $version $nodejs_iteration
+      nodejs_clean_install_root $id $version
+      nodejs_copy_sources       $id $version
+      nodejs_compile            $id $version
+      nodejs_update_npm         $id $version
+      nodejs_create_activation  $id $version
+      deb_create                $install_root/$id $id $version $nodejs_iteration
     )
-    nodejs_clean           $id $version
-    nodejs_create_metadata $id $version
+    nodejs_clean_install_root $id $version
+    nodejs_clean_build_root   $id $version
+    nodejs_create_metadata    $id $version
   done
 
   process_metadata "nodejs"

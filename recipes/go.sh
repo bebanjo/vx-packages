@@ -107,6 +107,7 @@ go_build () {
       echo " --> package for $id exists"
     )
     deb_exists $(go_package_file $id $version) || (
+      go_clean             $id $version
       hg_copy              $ref $go_source_repo $install_root/$id
       go_compile           $id $version
       go_install_tools     $id $version

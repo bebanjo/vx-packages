@@ -137,6 +137,7 @@ ruby_build () {
       echo " --> package for $id exists"
     )
     deb_exists $(ruby_package_file $id $build_id $version) || (
+      ruby_clean             $id $build_id $version
       ruby_compile           $id $build_id $version
       ruby_create_activation $id $build_id $version
       ruby_upgrade_rubygems  $id $build_id $version
