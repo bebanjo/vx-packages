@@ -69,17 +69,6 @@ export PATH=$dst/bin:\$PATH
 EOF
 }
 
-ruby_create_metadata () {
-  local id=$1
-  local build_id=$2
-  local version=$3
-  local meta=$ruby_metadata_root/$id
-
-  mkdir -p $ruby_metadata_root
-  echo " --> save metadata for $id to $meta"
-  echo "$id $(ruby_package_file $id $build_id $version)" > $meta
-}
-
 ruby_upgrade_rubygems () {
   local id=$1
   local build_id=$2
@@ -118,7 +107,6 @@ ruby_create_deb () {
 
 ruby_build () {
   git_clone https://github.com/sstephenson/ruby-build.git $ruby_build_source_repo
-  clean_metadata $ruby_metadata_root
 
   apt_install ruby1.9.1 ruby1.9.1-dev
 
@@ -158,8 +146,6 @@ ruby_build () {
     ruby_clean           $id $build_id $version
     ruby_create_metadata $id $build_id $version
   done
-
-  process_metadata "ruby"
 }
 
 ruby_build $@
