@@ -29,6 +29,11 @@ ruby_compile () {
       curl -fsSL https://gist.github.com/mislav/a18b9d7f0dc5b9efc162.txt | \
         silent_output env CONFIGURE_OPTS="--disable-install-rdoc" $ruby_build --patch $build_id $dst
       ;;
+    rbx*)
+      apt_install llvm llvm-dev
+      gem_install bundler rake
+      silent_output env CONFIGURE_OPTS="--disable-install-rdoc" $ruby_build $build_id $dst
+      ;;
     jruby*)
       apt_install openjdk-7-jre
       silent_output env CONFIGURE_OPTS="--disable-install-rdoc" $ruby_build $build_id $dst
@@ -115,6 +120,8 @@ ruby_build () {
   git_clone https://github.com/sstephenson/ruby-build.git $ruby_build_source_repo
   clean_metadata $ruby_metadata_root
 
+  apt_install ruby1.9.1 ruby1.9.1-dev
+
   for ref in "$@" ; do
     local id="ruby-$ref"
     local build_id="$ref"
@@ -123,6 +130,9 @@ ruby_build () {
     case $build_id in
       jruby*)
         version=$(echo $ref | sed -e "s/jruby-//")
+        ;;
+      rbx*)
+        version=$(echo $ref | sed -e "s/rbx-//")
         ;;
       2.2.0-dev)
         id="ruby-head"
