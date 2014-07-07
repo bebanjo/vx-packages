@@ -19,7 +19,7 @@ deb_exists () {
 
 deb_create () {
 
-  apt_install ruby ruby-dev
+  apt_install ruby1.9.1 ruby1.9.1-dev
   gem_install fpm
 
   local path=$1
