@@ -32,7 +32,7 @@ ruby_compile () {
     rbx*)
       apt_install llvm llvm-dev
       gem_install bundler rake
-      silent_output env CONFIGURE_OPTS="--disable-install-rdoc" $ruby_build $build_id $dst
+      silent_output env SHELL=/bin/sh CONFIGURE_OPTS="--disable-install-rdoc" $ruby_build $build_id $dst
       ;;
     jruby*)
       apt_install openjdk-7-jre
