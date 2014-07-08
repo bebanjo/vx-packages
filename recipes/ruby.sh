@@ -144,7 +144,6 @@ ruby_build () {
       ruby_create_deb        $id $build_id $version
     )
     ruby_clean           $id $build_id $version
-    ruby_create_metadata $id $build_id $version
   done
 }
 

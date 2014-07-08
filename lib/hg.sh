@@ -9,12 +9,12 @@ hg_clone () {
 
   if [ ! -d $dst ] ; then
     echo " --> hg clone $src to $dst"
-    hg clone $src $dst > /dev/null
+    silent_output hg clone $src $dst
   fi
 
   if [ -d $dst ] ; then
     echo " --> hg pull $dst"
-    hg pull -R $dst > /dev/null
+    silent_output hg pull -R $dst
   fi
 }
 
@@ -30,5 +30,5 @@ hg_copy () {
 
   mkdir -p $dst
   echo " --> hg clone $ref to $dst"
-  hg clone -u $ref $src $dst > /dev/null
+  silent_output hg clone -u $ref $src $dst
 }
