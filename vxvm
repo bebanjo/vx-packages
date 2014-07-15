@@ -4,7 +4,7 @@ set -e
 
 #
 pkg_prefix="vx-packages-"
-pkg_metadata="/dists/trusty/main/binary-amd64/Packages.gz"
+pkg_metadata="/dists/trusty/main/binary-amd64/Packages"
 pkg_host=${PKG_HOST:-http://mirror.pkg.vexor.io}
 pkg_install_path="/opt/vexor/packages"
 
@@ -57,7 +57,7 @@ vxvm_search_in_repo () {
 
   # download metadata
   local metadata=$($mktemp)
-  $curl $pkg_host/$pkg_metadata | gunzip | \
+  $curl $pkg_host/$pkg_metadata |  \
     $awk '/Package/{ print $2} ; /Filename/ { print $2 }' | \
     xargs -n2 \
     > $metadata
