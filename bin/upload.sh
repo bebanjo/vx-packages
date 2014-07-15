@@ -2,4 +2,4 @@
 
 set -e
 
-tar -c $1 | ssh vxpackages@pkg.vexor.io "Hi!"
+tar -c $1 | ssh repo@pkg.vexor.io "42"
