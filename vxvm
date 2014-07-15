@@ -13,9 +13,15 @@ awk=${AWK:-awk}
 curl="curl --fail --silent --show-error --tcp-nodelay --retry 3"
 mktemp="mktemp"
 
+dpkg="dpkg"
+
 if [ "x$(uname)" = "xDarwin" ] ; then
   awk="gawk"
   mktemp="mktemp -t vx"
+fi
+
+if [ "x$(id -u)" != "x0" ] ; then
+  dpkg="sudo dpkg"
 fi
 
 package_path=""
@@ -98,7 +104,7 @@ vxvm_search () {
   vxvm_valid_package_url
 
   echo "Version:  $(vxvm_extract_id)"
-  echo "Location: $pkg_host/${package_url}"
+  echo "Location: $pkg_host/${package_path}"
   echo "Install:  ${pkg_install_path}/$(vxvm_extract_id)"
 }
 
@@ -125,7 +131,7 @@ vxvm_install () {
 
     echoerr "download and install $id"
     $curl $pkg_host/$package_path > $tmp_file
-    silent_output dpkg -i $tmp_file
+    silent_output $dpkg -i $tmp_file
     rm -rf $tmp_dir
   fi
 
