@@ -2,7 +2,7 @@
 
 . lib/inc.sh
 
-go_source_repo=$sources_root/go
+go_download_path=$sources_root/go
 go_metadata_root=$metadata_root/go
 go_iteration=${GO_ITERATION:-1}
 
@@ -10,28 +10,6 @@ go_package_file () {
   local id=$1
   local version=$2
   deb_package_file $id $version $go_iteration
-}
-
-go_compile () {
-  local id=$1
-  local version=$2
-
-  local src=$install_root/$id
-
-  (
-    cd $src/src
-    unset GOARCH && unset GOOS && unset GOPATH && unset GOBIN && unset GOROOT
-    GO_INSTALL_ROOT=$src
-    GOROOT=$src
-    echo " --> build $id"
-
-    silent_output ./make.bash
-
-    cd $src
-    rm -rf ".hg"
-    rm -rf "doc"
-    rm -rf "test"
-  )
 }
 
 go_clean () {
@@ -44,16 +22,6 @@ go_clean () {
     echo " --> remove $src"
     rm -rf $src
   fi
-}
-
-go_create_metadata () {
-  local id=$1
-  local version=$2
-  local meta=$go_metadata_root/$id
-
-  mkdir -p $go_metadata_root
-  echo " --> create metadata for $id"
-  echo "$id $(go_package_file $id $version)" > $meta
 }
 
 go_create_activation () {
@@ -77,18 +45,44 @@ go_install_tools () {
 
   mkdir -p $src/global
 
-  echo " --> install code.google.com/p/go.tools/cmd/cover"
-  silent_output env GOPATH=$src/global PATH=$src/bin:$src/global/bin:$PATH go get code.google.com/p/go.tools/cmd/cover
-
   echo " --> install github.com/golang/lint/golint"
   silent_output env GOPATH=$src/global PATH=$src/bin:$src/global/bin:$PATH go get github.com/golang/lint/golint
 }
 
+go_download_binary () {
+  local id=$1
+  local version=$2
+  local dst=$go_download_path/$version
+  local url=https://storage.googleapis.com/golang/go${version}.linux-amd64.tar.gz
+
+  case $version in
+    "1.1.2")
+      url=https://go.googlecode.com/files/go${version}.linux-amd64.tar.gz
+      ;;
+  esac
+
+  mkdir -p $dst
+  echo " --> download and extract $id to $dst"
+  curl --fail --silent --show-error --tcp-nodelay --retry 3 $url | \
+    ( cd $dst ; tar -zxf - )
+  rm -rf $dst/go/blog $dst/go/doc $dst/go/test
+}
+
+go_install_binary () {
+  local id=$1
+  local version=$2
+  local src=$go_download_path/$version/go
+  local dst=$install_root/$id
+
+  mkdir -p $dst
+  echo " --> install $id to $dst"
+  (
+    cd $src ;
+    silent_output cp -vr $src/* $dst/
+  )
+}
+
 go_build () {
-  hg_clone https://go.googlecode.com/hg/ $go_source_repo
-
-  clean_metadata $go_metadata_root
-
   for ref in "$@" ; do
 
     local version=$(echo $ref | sed -e "s/[^\[:digit:].]//g")
@@ -107,20 +101,17 @@ go_build () {
     deb_exists $(go_package_file $id $version) && (
       echo " --> package for $id exists"
     )
+
     deb_exists $(go_package_file $id $version) || (
       go_clean             $id $version
-      hg_copy              $ref $go_source_repo $install_root/$id
-      go_compile           $id $version
-      go_install_tools     $id $version
+      go_download_binary   $id $version
+      go_install_binary    $id $version
       go_create_activation $id $version
       deb_create           $install_root/$id $id $version $go_iteration
     )
 
     go_clean           $id $version
-    go_create_metadata $id $version
   done
-
-  process_metadata "go"
 }
 
 go_build $@

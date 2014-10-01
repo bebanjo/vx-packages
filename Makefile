@@ -1,12 +1,12 @@
 #!/usr/bin/make -f
 
-GO_VERSIONS      := "go1.1.2 go1.2.2 go1.3 tip"
+GO_VERSIONS      := "go1.1.2 go1.2.2 go1.3 go1.3.1 go1.3.2 go1.3.3"
 GO_ITERATION     ?= 3
 
 RUBY_VERSIONS    := "1.9.3-p547 2.0.0-p481 2.1.0 2.1.1 2.1.2 2.1.3 jruby-1.7.13 rbx-2.2.7 2.2.0-dev"
 RUBY_ITERATION   ?= 3
 
-NODEJS_VERSIONS  := "0.9.12 0.10.29 0.11.13"
+NODEJS_VERSIONS  := "0.9.12 0.10.32 0.11.14"
 NODEJS_ITERATION ?= 3
 
 RUST_VERSIONS    := "0.11.0 nightly"
@@ -21,10 +21,17 @@ default: build
 
 .PHONY: go ruby nodejs metadata upload rust
 
-go:
+go_bin:
 	@echo
 	@echo "==== go: $(GO_VERSIONS) ===="
-	@recipes/go.sh $(GO_VERSIONS)
+	@recipes/go_bin.sh $(GO_VERSIONS)
+
+go_tip:
+	@echo
+	@echo "==== go: tip ===="
+	@recipes/go_src.sh tip
+
+go: go_bin go_tip
 
 ruby:
 	@echo
@@ -34,7 +41,7 @@ ruby:
 nodejs:
 	@echo
 	@echo "==== nodejs: $(NODEJS_VERSIONS) ===="
-	@recipes/nodejs.sh $(NODEJS_VERSIONS)
+	@recipes/nodejs_bin.sh $(NODEJS_VERSIONS)
 
 rust:
 	@echo
