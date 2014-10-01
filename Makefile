@@ -3,7 +3,7 @@
 GO_VERSIONS      := "go1.1.2 go1.2.2 go1.3 go1.3.1 go1.3.2 go1.3.3"
 GO_ITERATION     ?= 3
 
-RUBY_VERSIONS    := "1.9.3-p547 2.0.0-p481 2.1.0 2.1.1 2.1.2 2.1.3 jruby-1.7.13 rbx-2.2.7 2.2.0-dev"
+RUBY_VERSIONS    := "1.9.3-p547 2.0.0-p481 2.1.0 2.1.1 2.1.2 2.1.3 jruby-1.7.13 rbx-2.2.9 2.2.0-dev"
 RUBY_ITERATION   ?= 3
 
 NODEJS_VERSIONS  := "0.9.12 0.10.32 0.11.14"

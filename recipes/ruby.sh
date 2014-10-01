@@ -24,6 +24,11 @@ ruby_compile () {
   echo " --> build ruby $build_id in $dst"
 
   case $build_id in
+    2.1.0)
+      echo " --> compile ruby 2.1.0 with readline patch"
+      curl -fsSL https://gist.github.com/mislav/a18b9d7f0dc5b9efc162.txt | \
+        silent_output env CONFIGURE_OPTS="--disable-install-rdoc" $ruby_build --patch $build_id $dst
+      ;;
     2.1.1)
       echo " --> compile ruby 2.1.1 with readline patch"
       curl -fsSL https://gist.github.com/mislav/a18b9d7f0dc5b9efc162.txt | \
