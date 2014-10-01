@@ -59,8 +59,8 @@ vxvm_search_in_repo () {
   local metadata=$($mktemp)
   $curl $pkg_host/$pkg_metadata |  \
     $awk '/Package/{ print $2} ; /Filename/ { print $2 }' | \
-    xargs -n2 \
-    > $metadata
+    xargs -n2 | \
+    sort -r > $metadata
 
   # strict match
   package_path=$(cat $metadata | $awk -v ref="$regexp " 'match($0, ref){ print $2 }' | head -n1)
